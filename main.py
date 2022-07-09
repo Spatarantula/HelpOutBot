@@ -37,14 +37,17 @@ async def getVolunOp(update, context):
         volunOpList.append(ans) 
 
 async def checkOp(update, context):
-    await update.message.reply_text(f"Your options are {volunOpList}.\n(/clear to delete options)\n(/done to confirm)")
+    msg = ""
+    for choice in volunOpList:
+        msg += choice + ", "
+    await update.message.reply_text(f"Your options are {msg}\n(/clear to delete options)\n(/done to confirm)")
 
 async def clearOp(update, context):
     volunOpList.clear()
 
 async def doneOp(update, context): # send to json
     if len(volunOpList) == 0:
-        await update.message.reply_text("No options have been chosen!")
+        await update.message.reply_text("No options have been chosen!\n(/volunteer to start)")
         volunOp()
     else:
         await update.message.reply_text("Here are some sites to check out:")
@@ -52,7 +55,9 @@ async def doneOp(update, context): # send to json
             volunteerChoices = json.load(f)
         for choice in volunOpList:
             if choice in volunteerChoices.keys():
-                await update.message.reply_text(f"{choice.capitalize()}: {volunteerChoices[choice]}")
+                await update.message.reply_text(f"{choice.capitalize()}:")
+                for urls in volunteerChoices[choice]:
+                    await update.message.reply_text(f"{urls}")
                 # print(f"{volunteerChoices[choice]}\n")
         volunOpList.clear()
         
