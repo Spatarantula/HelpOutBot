@@ -5,6 +5,8 @@ import requests
 import os
 from dotenv import load_dotenv
 
+import json
+
 load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -40,9 +42,21 @@ async def checkOp(update, context):
 async def clearOp(update, context):
     volunOpList.clear()
 
-# async def doneOp(update, context):  send to json
-    
-    
+async def doneOp(update, context): # send to json
+    if len(volunOpList) == 0:
+        await update.message.reply_text("No options have been chosen!")
+        volunOp()
+    else:
+        await update.message.reply_text("Here are some sites to check out:")
+        with open("volunteers.json") as f:
+            volunteerChoices = json.load(f)
+        for choice in volunOpList:
+            if choice in volunteerChoices.keys():
+                await update.message.reply_text(f"{choice.capitalize()}: {volunteerChoices[choice]}")
+                # print(f"{volunteerChoices[choice]}\n")
+        volunOpList.clear()
+        
+
 # makes the bot
 bot = ApplicationBuilder().token(BOT_TOKEN).build()
 
@@ -51,6 +65,6 @@ bot.add_handler(CallbackQueryHandler(getVolunOp))
 
 bot.add_handler(CommandHandler("check", checkOp))
 bot.add_handler(CommandHandler("clear", clearOp))
-# bot.add_handler(CommandHandler("done", doneOp))
+bot.add_handler(CommandHandler("done", doneOp))
 
 bot.run_polling()
