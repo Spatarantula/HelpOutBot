@@ -10,9 +10,6 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 volunOpList = []
 
-async def hello(update, context):
-    await update.message.reply_text("G'day m'lady")
-    
 async def volunOp(update, context):
     keyboard = [
         [
@@ -28,7 +25,7 @@ async def volunOp(update, context):
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("What field do you want to volunteer in?\n (/check to confirm your options)", reply_markup=reply_markup)
+    await update.message.reply_text("What field do you want to volunteer in?\n(/check to view your selected options)", reply_markup=reply_markup)
 
 async def getVolunOp(update, context):
     query = update.callback_query
@@ -38,17 +35,22 @@ async def getVolunOp(update, context):
         volunOpList.append(ans) 
 
 async def checkOp(update, context):
-    await update.message.reply_text(f"Your options are {volunOpList}\nType /done to confirm")
+    await update.message.reply_text(f"Your options are {volunOpList}.\n(/clear to delete options)\n(/done to confirm)")
 
-#async def finalOp(update, context):
+async def clearOp(update, context):
+    volunOpList.clear()
+
+# async def doneOp(update, context):  send to json
+    
     
 # makes the bot
 bot = ApplicationBuilder().token(BOT_TOKEN).build()
 
-# respond to /hi with function hello
-bot.add_handler(CommandHandler("hi", hello))
 bot.add_handler(CommandHandler("volunteer", volunOp))
-bot.add_handler(CommandHandler("check", checkOp))
 bot.add_handler(CallbackQueryHandler(getVolunOp))
+
+bot.add_handler(CommandHandler("check", checkOp))
+bot.add_handler(CommandHandler("clear", clearOp))
+# bot.add_handler(CommandHandler("done", doneOp))
 
 bot.run_polling()
